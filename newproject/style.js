@@ -16,7 +16,8 @@ var gameOn = 0;
 var ticker = 0;
 var LScore = 0;
 var RScore = 0;
-
+var r = 0;
+var b = 255;
 function restart() {
     paddleLx = 20;
     paddleLy = 200;
@@ -40,12 +41,12 @@ function setup() {
     restart();
     // creates the text for the initial page
     textSize(50);
-    fill(255);
-    text("PONG", 100, 160);
-    text("MODIFIED", 120, 240);
     fill(0,0,255);
+    text("PONG", 100, 160);
+    text("MODIFIED", 100, 240);
+    fill(20,35,86);
     text("PONG", 100+3, 160+3);
-    text("MODIFIED", 120+3, 240+3);
+    text("MODIFIED", 100+3, 240+3);
 }
 
 //begins the game if the mouse is pressed
@@ -63,7 +64,10 @@ function mousePressed() {
 
 //main function called for the game to be played
 function update() {
-    background(0);
+    r=map(mouseY,0,600,0,255);
+    b=map(mouseY,0,600,255,0);
+
+    background(r,0,b);
     fill(255, 100);
     textSize(32);
     text(LScore, 10, 30);
@@ -101,8 +105,12 @@ function update() {
     //if player loses
     else if (ballX < -2) {
         ballVx = ballVy = 0;
-        textSize(32);
-        text("GAME OVER", 200, 200);
+        textSize(30);
+        fill(255,0,0)
+        text("GAME OVER!", 100, 200);
+        fill(87,20,35);
+        text("GAME OVER!", 100+2, 200+2);
+
         ++RScore;
         gameOn = 0;
         restart();
@@ -110,20 +118,25 @@ function update() {
     //if player wins
     else if (ballX > 402) {
         ballVx = ballVy = 0;
-        textSize(32);
-        text("You win!", 200, 200);
+        textSize(30);
+        fill(0,255,0)
+        text("YOU WIN!", 120, 200);
+        fill(20,87,35);
+        text("YOU WIN!", 120+2, 200+2);
         ++LScore;
         gameOn = 0;
         restart();
     }
 }
-//draw function (repeats continoulsy throughout the course of the sketch)
+//draw function (repeats continously throughout the course of the sketch)
 function draw() {
     if (gameOn == 1) {
         update();
     }
-    fill(255);
+    fill(random(255),random(255),random(255));
     rect(paddleLx-(paddleWidth/2), paddleLy-(paddleHeight/2), paddleWidth, paddleHeight);
+
     rect(paddleRx-(paddleWidth/2), paddleRy-(paddleHeight/2), paddleWidth, paddleHeight);
+    fill(random(255),0,random(255));
     ellipse(int(ballX), int(ballY), ballSize, ballSize);
 }
