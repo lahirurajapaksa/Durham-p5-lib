@@ -18,6 +18,9 @@ var LScore = 0;
 var RScore = 0;
 var r = 0;
 var b = 255;
+var r2 = 0;
+var b2 = 255;
+
 function restart() {
     paddleLx = 20;
     paddleLy = 200;
@@ -32,6 +35,8 @@ function restart() {
     paddleRx = 380;
     paddleRy = 200;
 }
+
+
 
 function setup() {
     //creates the canvas
@@ -64,10 +69,12 @@ function mousePressed() {
 
 //main function called for the game to be played
 function update() {
-    r=map(mouseY,0,600,0,255);
-    b=map(mouseY,0,600,255,0);
+    //to change background colour only when left paddle is moved
+    //r=map(mouseY,0,200,0,255);
+    //b=map(mouseY,0,200,255,0);
 
-    background(r,0,b);
+
+    //background(r,0,b);
     fill(255, 100);
     textSize(32);
     text(LScore, 10, 30);
@@ -83,8 +90,16 @@ function update() {
     //increments ticker variable
     ++ticker;
 
+
+
+
     //defines the movement for the right paddle to move autonomously
     paddleRy = int(ballY + 50*sin(sin((ballY + ticker)/30)));
+
+    // changes background colour when left and right paddle move
+    r2=map(paddleRy,0,400,0,255);
+    b2=map(mouseY,0,400,255,0);
+    background(r2,0,b2);
 
     // if the y coordinate of the ball is out of bounds, its direction is reversed
     if (ballY < 0 || ballY > 400) {
@@ -106,9 +121,9 @@ function update() {
     else if (ballX < -2) {
         ballVx = ballVy = 0;
         textSize(30);
-        fill(255,0,0)
-        text("GAME OVER!", 100, 200);
-        fill(87,20,35);
+        fill(0,0,0);
+        text("GAME OVER!", 100,200);
+        fill(random(255),0,0)
         text("GAME OVER!", 100+2, 200+2);
 
         ++RScore;
@@ -119,9 +134,9 @@ function update() {
     else if (ballX > 402) {
         ballVx = ballVy = 0;
         textSize(30);
-        fill(0,255,0)
+        fill(0,0,0)
         text("YOU WIN!", 120, 200);
-        fill(20,87,35);
+        fill(random(255),0,0);
         text("YOU WIN!", 120+2, 200+2);
         ++LScore;
         gameOn = 0;
@@ -139,4 +154,9 @@ function draw() {
     rect(paddleRx-(paddleWidth/2), paddleRy-(paddleHeight/2), paddleWidth, paddleHeight);
     fill(random(255),0,random(255));
     ellipse(int(ballX), int(ballY), ballSize, ballSize);
+
+    //if (mouseisPressed) {
+    //	ellipse(int(ballX), int(ballY), ballSize, ballSize);
+
+
 }
