@@ -8,8 +8,8 @@ var ballY;
 var ballVx;
 var ballVy;
 var ballSize = 20;
-var paddleWidth = 20;
-var paddleHeight = 60;
+var paddleWidth = 40;
+var paddleHeight = 120;
 var bigWidth = (ballSize + paddleWidth)/2;
 var bigHeight = (ballSize + paddleHeight)/2;
 var gameOn = 0;
@@ -21,10 +21,10 @@ var b2 = 255;
 let balls = [];
 
 function restart() {
-    paddleLx = 20;
-    paddleLy = 200;
-    paddleRx = 380;
-    paddleRy = 200;
+    paddleLx = 22;
+    paddleLy = 300;
+    paddleRx = 777;
+    paddleRy = 300;
     ballX = paddleLx + ballSize;
     ballY = paddleRy;
     ballVx = 0;
@@ -36,18 +36,18 @@ function restart() {
 
 function setup() {
     //creates the canvas
-    createCanvas(400, 400);
+    createCanvas(800, 400);
     // change the background attribute so that it changes colour as mousex and mousey changes
     background(0);
     restart();
     // creates the text for the initial page
     textSize(50);
     fill(0,0,255);
-    text("PONG", 100, 160);
-    text("MODIFIED", 100, 240);
+    text("PONG", 310, 160);
+    text("MODIFIED", 275, 240);
     fill(20,35,86);
-    text("PONG", 100+3, 160+3);
-    text("MODIFIED", 100+3, 240+3);
+    text("PONG", 310+2, 160+2);
+    text("MODIFIED", 275+2, 240+2);
 }
 
 
@@ -57,7 +57,7 @@ function mousePressed() {
 }
 
 //begins the game if the mouse is pressed
-function mouseDragged() {
+function mousePressed() {
     if (gameOn == 0) {
         gameOn = 1;
         ballVx = 5;
@@ -128,24 +128,24 @@ function update() {
     //if player loses
     else if (ballX < -2) {
         ballVx = ballVy = 0;
-        textSize(30);
+        textSize(50);
         fill(0,0,0);
-        text("GAME OVER!", 100,200);
+        text("GAME OVER!", 215,200);
         fill(random(255),0,0)
-        text("GAME OVER!", 100+2, 200+2);
+        text("GAME OVER!", 215+2, 200+2);
 
         ++RScore;
         gameOn = 0;
         restart();
     }
     //if player wins
-    else if (ballX > 402) {
+    else if (ballX > 802) {
         ballVx = ballVy = 0;
-        textSize(30);
+        textSize(50);
         fill(0,0,0)
-        text("YOU WIN!", 120, 200);
+        text("YOU WIN!", 260, 200);
         fill(random(255),0,0);
-        text("YOU WIN!", 120+2, 200+2);
+        text("YOU WIN!", 260+2, 200+2);
         ++LScore;
         gameOn = 0;
         restart();
