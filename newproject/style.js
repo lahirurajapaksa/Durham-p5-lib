@@ -18,6 +18,7 @@ var LScore = 0;
 var RScore = 0;
 var r2 = 0;
 var b2 = 255;
+let balls = [];
 
 function restart() {
     paddleLx = 20;
@@ -64,6 +65,10 @@ function mousePressed() {
     }
 }
 
+function mousePressed() {
+    let b = new Ball();
+    balls.push(b)
+}
 
 
 //main function called for the game to be played
@@ -180,6 +185,11 @@ function draw() {
     fill(random(255),0,random(255));
     ellipse(int(ballX), int(ballY), ballSize, ballSize);
 
+    for (let i=0; i<balls.length; i++) {
+        balls[i].move();
+        balls[i].show();
+    }
+
 
     class Ball {
         constructor() {
@@ -204,11 +214,3 @@ function draw() {
         }
     }
 }
-
-
-
-
-
-
-}
-
