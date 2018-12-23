@@ -51,9 +51,13 @@ function setup() {
 }
 
 
+function mousePressed() {
+    let b = new Ball();
+    balls.push(b)
+}
 
 //begins the game if the mouse is pressed
-function mousePressed() {
+function mouseDragged() {
     if (gameOn == 0) {
         gameOn = 1;
         ballVx = 5;
@@ -65,10 +69,7 @@ function mousePressed() {
     }
 }
 
-function mousePressed() {
-    let b = new Ball();
-    balls.push(b)
-}
+
 
 
 //main function called for the game to be played
@@ -190,7 +191,6 @@ function draw() {
         balls[i].show();
     }
 
-
     class Ball {
         constructor() {
             this.ballSize=20
@@ -198,19 +198,18 @@ function draw() {
             this.paddleLy=200
             this.paddleRx=380
             this.paddleRy=200
-            this.ballVx=0
+            this.ballVx=5
             this.ballVy=0
-            this.ballX=this.paddleLx+this.ballSize
-            this.ballY=this.paddleRy
+            //this.ballX=this.paddleLx+this.ballSize
+            //this.ballY=this.paddleRy
         }
-
         move() {
             this.ballX=this.paddleLx+this.ballSize
             this.ballY=this.paddleRy
         }
-
         show() {
             ellipse(int(this.ballX),int(this.ballY),this.ballSize,this.ballSize)
         }
     }
 }
+
