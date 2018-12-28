@@ -1,215 +1,196 @@
-//declare all variables
-var paddleLx;
-var paddleLy;
-var paddleRx;
-var paddleRy;
-var ballX;
-var ballY;
-var ballVx;
-var ballVy;
-var ballSize = 20;
-var paddleWidth = 40;
-var paddleHeight = 120;
-var bigWidth = (ballSize + paddleWidth)/2;
-var bigHeight = (ballSize + paddleHeight)/2;
-var gameOn = 0;
-var ticker = 0;
-var LScore = 0;
-var RScore = 0;
-var r2 = 0;
-var b2 = 255;
-let balls = [];
-
-function restart() {
-    paddleLx = 22;
-    paddleLy = 300;
-    paddleRx = 777;
-    paddleRy = 300;
-    ballX = paddleLx + ballSize;
-    ballY = paddleRy;
-    ballVx = 0;
-    ballVy = 0;
-
-}
-
-
+let Lscore = 0;
+let Rscore = 0;
+let r2 = 0;
+let b2 = 255;
+balls=[]
 
 function setup() {
-    //creates the canvas
     createCanvas(800, 400);
-    // change the background attribute so that it changes colour as mousex and mousey changes
-    background(0);
-    restart();
-    // creates the text for the initial page
-    textSize(50);
-    fill(0,0,255);
-    text("PONG", 310, 160);
-    text("MODIFIED", 275, 240);
-    fill(20,35,86);
-    text("PONG", 310+2, 160+2);
-    text("MODIFIED", 275+2, 240+2);
+
+    ball = new Ball();
+    left = new Paddle(true);
+    right = new Paddle(false);
+
+    for (let i = 0; i<1; i++) {
+        balls[i] = new Ball()
+    }
+
+
+
 }
 
+
+
+
+
+function draw() {
+    background(0);
+    r2=map(right.y,0,400,255,0)
+    b2-=map(left.y,400,800,0,255)
+    background(r2,0,b2)
+
+    for (let i= 0; i<1; i++) {
+        balls[i].update();
+        balls[i].edges();
+        balls[i].show();
+        balls[i].checkPaddleRight(right)
+        balls[i].checkPaddleLeft(left)
+    }
+    ball.checkPaddleRight(right);
+    ball.checkPaddleLeft(left);
+
+    left.show();
+    right.show();
+    left.update();
+    right.update();
+
+    ball.update();
+    ball.edges();
+    ball.show();
+
+    fill(255);
+    textSize(32);
+    text(Lscore, 32, 40);
+    text(Rscore, width-64, 40);
+
+
+}
 
 function mousePressed() {
     let b = new Ball();
     balls.push(b)
 }
+function keyReleased() {
+    left.move(0);
+    right.move(0);
+}
 
-//begins the game if the mouse is pressed
-function mousePressed() {
-    if (gameOn == 0) {
-        gameOn = 1;
-        ballVx = 5;
+function keyPressed() {
+    console.log(key);
+    if (key == 'W' || key == "w") {
+        left.move(-10);
+    } else if (key == 'S' || key == "s") {
+        left.move(10);
     }
-    //if the game has ended and the mouse has been pressed again, the game is restarted
-    else {
-        restart();
-        gameOn = 0;
+
+    if (key == 'ArrowUp') {
+        right.move(-10);
+    } else if (key == 'ArrowDown') {
+        right.move(10);
     }
 }
 
+class Ball {
+    constructor() {
+        this.x = width/2;
+        this.y = height/2;
+        this.xspeed = 0;
+        this.yspeed = 0;
+        this.r = 12;
 
-
-
-//main function called for the game to be played
-function update() {
-
-
-
-    //background(r,0,b);
-
-    //fill(random(255),0,0)
-    //text(Lscore, 10,30);
-    //fill(random(255),0,0)
-    //text(Rscore, 360, 30);
-
-    //responsible for moving the user's paddle
-    paddleLy = mouseY;
-
-    //
-    ballX=ballX+ballVx;
-    ballY=ballY+ballVy;
-
-    //increments ticker variable
-    ++ticker;
-
-
-
-    //defines the movement for the right paddle to move autonomously
-    paddleRy = int(ballY + 50*sin(sin((ballY + ticker)/30)));
-
-    // changes background colour when left and right paddle move
-    r2=map(paddleRy,0,400,0,255);
-    b2=map(mouseY,0,400,255,0);
-    background(r2,0,b2);
-
-    fill(0,0);
-    textSize(32);
-    text(LScore, 10, 30);
-    text(RScore, 360, 30);
-
-    // if the y coordinate of the ball is out of bounds, its direction is reversed
-    if (ballY < 0 || ballY > 400) {
-        ballVy=ballVy*-1
+        this.reset();
     }
 
-    //rules for handling how the paddles interact with the ball
-    else if ((paddleLx - bigWidth < ballX) && (ballX < paddleLx + bigWidth) && (paddleLy - bigHeight < ballY) && (ballY < paddleLy + bigHeight)) {
-        ballVy = ((ballY - paddleLy)/float(bigHeight))*4;
-        ballVx *= -1.1;
-        ballX += 1;
-    }
-    else if ((paddleRx - bigWidth < ballX) && (ballX < paddleRx + bigWidth) && (paddleRy - bigHeight < ballY) && (ballY < paddleRy + bigHeight)) {
-        ballVy = ((ballY - paddleRy)/float(bigHeight))*4;
-        ballVx *= -1;
-        ballX -= 1;
-    }
-    //if player loses
-    else if (ballX < -2) {
-        ballVx = ballVy = 0;
-        textSize(50);
-        fill(0,0,0);
-        text("GAME OVER!", 215,200);
-        fill(random(255),0,0)
-        text("GAME OVER!", 215+2, 200+2);
+    checkPaddleLeft(p) {
+        if (this.y - this.r < p.y + p.h/2 &&
+            this.y + this.r > p.y - p.h/2 &&
+            this.x - this.r < p.x + p.w/2) {
 
-        ++RScore;
-        gameOn = 0;
-        restart();
-    }
-    //if player wins
-    else if (ballX > 802) {
-        ballVx = ballVy = 0;
-        textSize(50);
-        fill(0,0,0)
-        text("YOU WIN!", 260, 200);
-        fill(random(255),0,0);
-        text("YOU WIN!", 260+2, 200+2);
-        ++LScore;
-        gameOn = 0;
-        restart();
-    }
-}
-//	if (ballVx == 2) {
-//text("Level 2")
-//	}
-//else if (ballVx == 3) {
-//	text("Level 3")
-//}
-//else if (ballVx == 4) {
-//text("Level 4")
-//	}
-//	else if (ballVx == 5) {
-//text("Level 5")
-//}
-//else if (ballVx == 6) {
-//	text("Level 6")
-//}
-//else if (ballVx == 7) {
-//text("Level 7")
-//}
-//else if (ballVx == 7) {
-//text("Level 7")
-//}
+            if (this.x > p.x) {
+                let diff = this.y - (p.y - p.h/2);
+                let rad = radians(45);
+                let angle = map(diff, 0, p.h, -rad, rad);
+                this.xspeed = 5 * cos(angle);
+                this.yspeed = 5 * sin(angle);
+                this.x = p.x + p.w/2 + this.r;
+            }
 
-
-//draw function (repeats continously throughout the course of the sketch)
-function draw() {
-    if (gameOn == 1) {
-        update();
-    }
-    fill(random(255),random(255),random(255));
-    rect(paddleLx-(paddleWidth/2), paddleLy-(paddleHeight/2), paddleWidth, paddleHeight);
-
-    rect(paddleRx-(paddleWidth/2), paddleRy-(paddleHeight/2), paddleWidth, paddleHeight);
-    fill(random(255),0,random(255));
-    ellipse(int(ballX), int(ballY), ballSize, ballSize);
-
-    for (let i=0; i<balls.length; i++) {
-        balls[i].move();
-        balls[i].show();
-    }
-
-    class Ball {
-        constructor() {
-            this.ballSize=20
-            this.paddleLx=20
-            this.paddleLy=200
-            this.paddleRx=380
-            this.paddleRy=200
-            this.ballVx=5
-            this.ballVy=0
-            //this.ballX=this.paddleLx+this.ballSize
-            //this.ballY=this.paddleRy
         }
-        move() {
-            this.ballX=this.paddleLx+this.ballSize
-            this.ballY=this.paddleRy
+    }
+    checkPaddleRight(p) {
+        if (this.y - this.r < p.y + p.h/2 &&
+            this.y + this.r > p.y - p.h/2 &&
+            this.x + this.r > p.x - p.w/2) {
+
+            if (this.x < p.x) {
+                let diff = this.y - (p.y - p.h/2);
+                let angle = map(diff, 0, p.h, radians(225), radians(135));
+                this.xspeed = 5 * cos(angle);
+                this.yspeed = 5 * sin(angle);
+                this.x = p.x - p.w/2 - this.r;
+            }
         }
-        show() {
-            ellipse(int(this.ballX),int(this.ballY),this.ballSize,this.ballSize)
+    }
+
+    update() {
+        this.x += this.xspeed;
+        this.y += this.yspeed;
+    }
+
+    reset() {
+        this.x = width/2;
+        this.y = height/2;
+        let angle = random(-PI/4, PI/4);
+        this.xspeed = 5 * Math.cos(angle);
+        this.yspeed = 5 * Math.sin(angle);
+
+        if (random(1) < 0.5) {
+            this.xspeed *= -1;
         }
+    }
+
+    edges() {
+        if (this.y < 0 || this.y > height) {
+            this.yspeed *= -1;
+        }
+
+        if (this.x - this.r > width) {
+            Lscore++;
+            this.reset();
+        }
+
+        if (this.x + this.r < 0) {
+            Rscore++;
+            this.reset();
+        }
+    }
+
+    show() {
+        fill(random(255),0,random(255));
+        ellipse(this.x, this.y, this.r*2);
     }
 }
 
+class Paddle {
+    constructor(isLeft) {
+        this.y = height/2;
+        this.w = 20;
+        this.h = 100;
+        this.ychange = 0;
+
+        if (isLeft) {
+            this.x = this.w;
+        } else {
+            this.x = width - this.w;
+        }
+
+
+    }
+
+    update() {
+        this.y += this.ychange;
+        this.y = constrain(this.y, this.h/2, height-this.h/2);
+    }
+
+    move(steps) {
+        this.ychange = steps;
+    }
+
+    show() {
+        rectMode(CENTER);
+        fill(random(255),random(255),random(255));
+        rect(this.x, this.y, this.w, this.h);
+
+
+    }
+}
