@@ -14,10 +14,23 @@ let isCrazyPaddles = false;
 let CrazyPaddles;
 let Lscore=0
 let Rscore=0
+let stars=[]
+let speed
+let firstflag=true
+let secondflag=true
 
 function setup() {
-    createCanvas(700, 500)
+    createCanvas(400, 500)
     background(0)
+    function setuploop() {
+        if (firstflag){
+            for (var i = 0; i < 800; i++) {
+                stars[i] = new Star()
+            }
+        }
+    }
+    setuploop()
+
     menu();
 }
 
@@ -31,29 +44,81 @@ function draw() {
     } else if (isCrazyPaddles) {
         CrazyPaddles.draw();
     }
+    function drawloop() {
+        if (secondflag) {
+            speed = map(mouseY, 0, width, 0, 50);
+            background(0);
+            translate(width / 2, height / 2);
+            for (var j = 0; j < stars.length; j++) {
+                stars[j].update();
+                stars[j].show();
+            }
+        }
+    }
+    drawloop()
 
 }
 
+function Star() {
+    this.x = random(-width, width);
+    this.y = random(-height, height);
+    this.z = random(width);
+    this.pz = this.z;
+
+    this.update = function() {
+        this.z = this.z - speed;
+        if (this.z < 1) {
+            this.z = width;
+            this.x = random(-width, width);
+            this.y = random(-height, height);
+            this.pz = this.z;
+        }
+    }
+
+    this.show = function() {
+        fill(255);
+        noStroke();
+
+        var sx = map(this.x / this.z, 0, 1, 0, width);
+        var sy = map(this.y / this.z, 0, 1, 0, height);
+
+        var r = map(this.z, 0, width, 16, 0);
+        ellipse(sx, sy, r, r);
+
+        var px = map(this.x / this.pz, 0, 1, 0, width);
+        var py = map(this.y / this.pz, 0, 1, 0, height);
+
+        this.pz = this.z;
+
+        stroke(255);
+        line(px, py, sx, sy);
+
+    }
+}
 
 
 
 function menu() {
     background(120, 0, 255);
+
+
     button = createButton("Normal Multiplayer")
     button.mousePressed(beginNormalMultiplayer)
-    button.position(135, 60);
+    button.position(135, 225);
 
     button2 = createButton("Multiplayer ball frenzy");
-    button2.position(130, 180);
+    button2.position(130, 250);
     button2.mousePressed(beginMultiplayerFrenzy);
 
 
-    button4 = createButton("Crazy Paddles")
-    button4.position(155, 320)
+    button4 = createButton("Crazy Mode")
+    button4.position(152, 175)
+    text("Randomly generated paddles and ball",100,295)
     button4.mousePressed(beginCrazyPaddles)
 
     button5 = createButton("Epilepsy mode")
-    button5.position(155, 360)
+    button5.position(147, 200)
+    text("Too many balls", 151, 355)
     button5.mousePressed(beginEpilepsyMode);
 
 
@@ -70,10 +135,13 @@ function menu() {
     text("W and S for player 1", 140, 119)
     text("ArrowUp and ArrowDown for player 2", 110, 138)
     text("A lot of balls.", 160, 215)
+    text("Click the mouse", 152, 230)
 }
 
 
 function beginEpilepsyMode() {
+    firstflag=false
+    secondflag=false
     isEpilepsyMode = true;
     epilepsyMode = new Epilepsymode();
     epilepsyMode.setup();
@@ -82,18 +150,24 @@ function beginEpilepsyMode() {
 
 
 function beginNormalMultiplayer() {
+    firstflag=false
+    secondflag=false
     isNormalMultiplayer = true
     NormalMultiplayer = new NormalMultiplayermode()
     NormalMultiplayer.setup()
 }
 
 function beginMultiplayerFrenzy() {
+    firstflag=false
+    secondflag=false
     isMultiplayerFrenzy = true
     MultiplayerFrenzy = new MultiplayerFrenzymode();
     MultiplayerFrenzy.setup();
 }
 
 function beginCrazyPaddles() {
+    firstflag=false
+    secondflag=false
     isCrazyPaddles = true
     CrazyPaddles = new CrazyPaddlesmode();
     CrazyPaddles.setup();
