@@ -3,10 +3,9 @@ let button2
 let button3
 let button4
 let button5
+let button6
 let isEpilepsyMode = false;
 let epilepsyMode;
-let isSinglePlayer = false;
-let SinglePlayer;
 let isNormalMultiplayer = false;
 let NormalMultiplayer;
 let isMultiplayerFrenzy = false;
@@ -15,10 +14,9 @@ let isCrazyPaddles = false;
 let CrazyPaddles;
 let Lscore=0
 let Rscore=0
-let gameOn=0
 
 function setup() {
-    createCanvas(400, 400)
+    createCanvas(700, 500)
     background(0)
     menu();
 }
@@ -26,8 +24,6 @@ function setup() {
 function draw() {
     if (isEpilepsyMode) {
         epilepsyMode.draw();
-    } else if (isSinglePlayer) {
-        SinglePlayer.draw();
     } else if (isNormalMultiplayer) {
         NormalMultiplayer.draw();
     } else if (isMultiplayerFrenzy) {
@@ -51,9 +47,6 @@ function menu() {
     button2.position(130, 180);
     button2.mousePressed(beginMultiplayerFrenzy);
 
-    button3 = createButton("Singleplayer (use mouse)");
-    button3.position(125, 260);
-    button3.mousePressed(beginSinglePlayer)
 
     button4 = createButton("Crazy Paddles")
     button4.position(155, 320)
@@ -77,8 +70,8 @@ function menu() {
     text("W and S for player 1", 140, 119)
     text("ArrowUp and ArrowDown for player 2", 110, 138)
     text("A lot of balls.", 160, 215)
-    text("Guide your paddle with the mouse", 115, 295)
 }
+
 
 function beginEpilepsyMode() {
     isEpilepsyMode = true;
@@ -87,11 +80,6 @@ function beginEpilepsyMode() {
 
 }
 
-function beginSinglePlayer() {
-    isSinglePlayer = true
-    SinglePlayer = new Singleplayer()
-    SinglePlayer.setup();
-}
 
 function beginNormalMultiplayer() {
     isNormalMultiplayer = true
@@ -112,8 +100,10 @@ function beginCrazyPaddles() {
 }
 
 function mouseClicked() {
-    let b = new Ball();
-    balls.push(b)
+    if (isMultiplayerFrenzy) {
+        let b = new Ball();
+        balls.push(b)
+    }
 }
 
 
@@ -134,6 +124,10 @@ function keyPressed() {
     }
 }
 
+function keyReleased() {
+    left.move(0);
+    right.move(0);
+}
 
 function MultiplayerFrenzymode() {
     clear();
@@ -318,164 +312,6 @@ class Paddle {
 
 }
 
-function Singleplayer() {
-    clear();
-    hideButtons();
-    var paddleLx;
-    var paddleLy;
-    var paddleRx;
-    var paddleRy;
-    var ballX;
-    var ballY;
-    var ballVx;
-    var ballVy;
-    var ballSize = 20;
-    var paddleWidth = 20;
-    var paddleHeight = 120;
-    var bigWidth = (ballSize + paddleWidth) / 2;
-    var bigHeight = (ballSize + paddleHeight) / 2;
-    var ticker = 0;
-    var LScore = 0;
-    var RScore = 0;
-    var r2 = 0;
-    var b2 = 255;
-    let balls = [];
-
-
-    function restart() {
-        paddleLx = 22;
-        paddleLy = 300;
-        paddleRx = 777;
-        paddleRy = 300;
-        ballX = paddleLx + ballSize;
-        ballY = paddleRy;
-        ballVx = 0;
-        ballVy = 0;
-    }
-
-
-
-    this.setup = function() {
-        createCanvas(800, 400);
-        // change the background attribute so that it changes colour as mousex and mousey changes
-        background(0);
-        restart();
-        // creates the text for the initial page
-        textSize(50);
-        fill(0, 0, 255);
-        text("PONG", 310, 160);
-        text("MODIFIED", 275, 240);
-        fill(20, 35, 86);
-        text("PONG", 310 + 2, 160 + 2);
-        text("MODIFIED", 275 + 2, 240 + 2);
-    }
-
-
-    //function mousePressed() {
-    //let b = new Ball();
-    //	balls.push(b)
-    //}
-
-
-
-    //begins the game if the mouse is pressed
-
-
-
-    function mouseClicked() {
-        if (gameOn == 0) {
-            gameOn = 1;
-            ballVx = 5;
-        }
-
-    }
-
-
-    //main function called for the game to be played
-    function update() {
-
-        //responsible for moving the user's paddle
-        paddleLy = mouseY;
-
-        //
-        ballX = ballX + ballVx;
-        ballY = ballY + ballVy;
-
-        //increments ticker variable
-        ++ticker;
-
-
-
-        //defines the movement for the right paddle to move autonomously
-        paddleRy = int(ballY + 50 * sin(sin((ballY + ticker) / 30)));
-
-        // changes background colour when left and right paddle move
-        r2 = map(paddleRy, 0, 400, 0, 255);
-        b2 = map(mouseY, 0, 400, 255, 0);
-        background(r2, 0, b2);
-
-        fill(255, 255, 255);
-        textSize(32);
-        text(LScore, 10, 30);
-        text(RScore, 770, 30);
-
-        // if the y coordinate of the ball is out of bounds, its direction is reversed
-        if (ballY < 0 || ballY > 400) {
-            ballVy = ballVy * -1
-        }
-
-        //rules for handling how the paddles interact with the ball
-        else if ((paddleLx - bigWidth < ballX) && (ballX < paddleLx + bigWidth) && (paddleLy - bigHeight < ballY) && (ballY < paddleLy + bigHeight)) {
-            ballVy = ((ballY - paddleLy) / float(bigHeight)) * 4;
-            ballVx *= -1.1;
-            ballX += 1;
-        } else if ((paddleRx - bigWidth < ballX) && (ballX < paddleRx + bigWidth) && (paddleRy - bigHeight < ballY) && (ballY < paddleRy + bigHeight)) {
-            ballVy = ((ballY - paddleRy) / float(bigHeight)) * 4;
-            ballVx *= -1;
-            ballX -= 1;
-        }
-        //if player loses
-        else if (ballX < -2) {
-            ballVx = ballVy = 0;
-            textSize(50);
-            fill(0, 0, 0);
-            text("GAME OVER!", 215, 200);
-            fill(random(255), 0, 0)
-            text("GAME OVER!", 215 + 2, 200 + 2);
-
-            ++RScore;
-            gameOn = 0;
-            restart();
-        }
-        //if player wins
-        else if (ballX > 802) {
-            ballVx = ballVy = 0;
-            textSize(50);
-            fill(0, 0, 0)
-            text("YOU WIN!", 260, 200);
-            fill(random(255), 0, 0);
-            text("YOU WIN!", 260 + 2, 200 + 2);
-            ++LScore;
-            gameOn = 0;
-            restart();
-        }
-    }
-
-
-    //draw function (repeats continously throughout the course of the sketch)
-    this.draw = function() {
-        if (gameOn == 1) {
-            update();
-        }
-        fill(random(255), random(255), random(255));
-        rect(paddleLx - (paddleWidth / 2), paddleLy - (paddleHeight / 2), paddleWidth, paddleHeight);
-
-        rect(paddleRx - (paddleWidth / 2), paddleRy - (paddleHeight / 2), paddleWidth, paddleHeight);
-        fill(random(255), 0, random(255));
-        ellipse(int(ballX), int(ballY), ballSize, ballSize);
-
-    }
-}
 
 
 
@@ -534,10 +370,7 @@ function NormalMultiplayermode() {
         }
     }
 
-    function keyReleased() {
-        left.move(0);
-        right.move(0);
-    }
+
 
 }
 
@@ -723,7 +556,6 @@ function CrazyPaddlesmode() {
 
     function menu() {
         background(0);
-        button = createButton("HELLO")
     }
 
 
@@ -1048,7 +880,6 @@ function Epilepsymode() {
 function hideButtons() {
     button.hide();
     button2.hide();
-    button3.hide();
     button4.hide();
     button5.hide();
 }
