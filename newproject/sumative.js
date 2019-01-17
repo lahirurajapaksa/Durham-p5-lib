@@ -36,7 +36,7 @@ function setup() {
     function setuploop() {
         if (firstflag){
             for (var i = 0; i < 800; i++) {
-                stars[i] = new Star()
+                stars[i] = new outerspace()
             }
         }
     }
@@ -74,7 +74,7 @@ function draw() {
 
 }
 
-function Star() {
+function outerspace() {
     //x and y coordinate
     this.x = random(-width, width);
     this.y = random(-height, height);
@@ -114,20 +114,20 @@ function menu() {
     //creates different buttons for the menu and maps each button press to its corresponding function
     button = createButton("Normal Multiplayer")
     button.mousePressed(beginNormalMultiplayer)
-    button.position(655, 345);
+    button.position(655, 375);
 
     button2 = createButton("Multiplayer ball frenzy");
-    button2.position(650, 370);
+    button2.position(650, 400);
     button2.mousePressed(beginMultiplayerFrenzy);
 
 
     button4 = createButton("Crazy Mode")
-    button4.position(672, 295)
+    button4.position(672, 325)
     text("Randomly generated paddles and ball",100,295)
     button4.mousePressed(beginCrazyPaddles)
 
     button5 = createButton("SPAWN! mode")
-    button5.position(667, 320)
+    button5.position(667, 350)
     text("Too many balls", 151, 355)
     button5.mousePressed(beginEpilepsyMode);
 
@@ -246,11 +246,11 @@ function MultiplayerFrenzymode() {
                 balls[i].update();
                 balls[i].edges();
                 balls[i].show();
-                balls[i].checkPaddleRight(right)
-                balls[i].checkPaddleLeft(left)
+                balls[i].collideright(right)
+                balls[i].collideleft(left)
             }
-            ball.checkPaddleRight(right);
-            ball.checkPaddleLeft(left);
+            ball.collideright(right);
+            ball.collideleft(left);
 
             left.show();
             right.show();
@@ -295,7 +295,7 @@ function MultiplayerFrenzymode() {
             this.reset();
         }
 
-        checkPaddleLeft(p) {
+        collideleft(p) {
             //function allows the ball to properly bounce off the paddle
             //if statement ensures that the ball is within the x and y co-ordinates in relation to its radius so that
             //it can bounce off the relevant paddle
@@ -316,7 +316,7 @@ function MultiplayerFrenzymode() {
 
             }
         }
-        checkPaddleRight(p) {
+        collideright(p) {
             //same as checkPaddleLeft except the last part of the if statement has this.x+this.r>p.x-p.w/2 because of the
             //horizontal difference between the two left and right paddles, as checkPaddleLeft had this.x+this.r<p.x+p.w
             if (this.y - this.r < p.y + p.h / 2 &&
@@ -450,8 +450,8 @@ function NormalMultiplayermode() {
             background(r2, 0, b2)
 
 
-            ball.checkPaddleRight(right);
-            ball.checkPaddleLeft(left);
+            ball.collideright(right);
+            ball.collideleft(left);
 
             left.show();
             right.show();
@@ -485,7 +485,7 @@ class Ball {
         this.reset();
     }
 
-    checkPaddleLeft(p) {
+    collideleft(p) {
         if (this.y - this.r < p.y + p.h / 2 &&
             this.y + this.r > p.y - p.h / 2 &&
             this.x - this.r < p.x + p.w / 2) {
@@ -501,7 +501,7 @@ class Ball {
 
         }
     }
-    checkPaddleRight(p) {
+    collideright(p) {
         if (this.y - this.r < p.y + p.h / 2 &&
             this.y + this.r > p.y - p.h / 2 &&
             this.x + this.r > p.x - p.w / 2) {
@@ -626,8 +626,8 @@ function CrazyPaddlesmode() {
         background(r2, 0, b2)
 
 
-        ball.checkPaddleRight(right);
-        ball.checkPaddleLeft(left);
+        ball.collideright(right);
+        ball.collideleft(left);
 
         left.show();
         right.show();
@@ -670,7 +670,7 @@ function CrazyPaddlesmode() {
             this.reset();
         }
 
-        checkPaddleLeft(p) {
+        collideleft(p) {
             if (this.y - this.r < p.y + p.h / 2 &&
                 this.y + this.r > p.y - p.h / 2 &&
                 this.x - this.r < p.x + p.w / 2) {
@@ -686,7 +686,7 @@ function CrazyPaddlesmode() {
 
             }
         }
-        checkPaddleRight(p) {
+        collideright(p) {
             if (this.y - this.r < p.y + p.h / 2 &&
                 this.y + this.r > p.y - p.h / 2 &&
                 this.x + this.r > p.x - p.w / 2) {
@@ -811,11 +811,11 @@ function Epilepsymode() {
             balls[i].update();
             balls[i].edges();
             balls[i].show();
-            balls[i].checkPaddleRight(right)
-            balls[i].checkPaddleLeft(left)
+            balls[i].collideright(right)
+            balls[i].collideleft(left)
         }
-        ball.checkPaddleRight(right);
-        ball.checkPaddleLeft(left);
+        ball.collideright(right);
+        ball.collideleft(left);
 
         left.show();
         right.show();
@@ -861,7 +861,7 @@ function Epilepsymode() {
             this.reset();
         }
 
-        checkPaddleLeft(p) {
+        collideleft(p) {
             if (this.y - this.r < p.y + p.h / 2 &&
                 this.y + this.r > p.y - p.h / 2 &&
                 this.x - this.r < p.x + p.w / 2) {
@@ -877,7 +877,7 @@ function Epilepsymode() {
 
             }
         }
-        checkPaddleRight(p) {
+        collideright(p) {
             if (this.y - this.r < p.y + p.h / 2 &&
                 this.y + this.r > p.y - p.h / 2 &&
                 this.x + this.r > p.x - p.w / 2) {
