@@ -24,10 +24,12 @@ let secondflag=true
 //setup function
 
 function setup() {
-
+    //make createcanvas a variable
     let cnv = createCanvas(400, 500)
+    //assign x and y values
     let xofcnv=(windowWidth - width)/2
     let yofcnv=(windowHeight - width-100)/2
+    //position the canvas on the page
     cnv.position(xofcnv,yofcnv)
     background(0)
     //runs function for background of menuscreen
@@ -73,38 +75,33 @@ function draw() {
 }
 
 function Star() {
+    //x and y coordinate
     this.x = random(-width, width);
     this.y = random(-height, height);
+    //randomly generated value between the values of the width
     this.z = random(width);
-    this.pz = this.z;
 
     this.update = function() {
+        //subtracts the speed value which is corelated to the position of the mouse y pointer
         this.z = this.z - speed;
         if (this.z < 1) {
             this.z = width;
             this.x = random(-width, width);
             this.y = random(-height, height);
-            this.pz = this.z;
         }
     }
 
     this.show = function() {
         fill(255);
         noStroke();
-
+        //  this.x/this.z and this.y/this.z allows the value being divided to keep getting bigger and bigger so that the ellipses
+        //will get mapped properly allowing them to move out from the center to the edge
         var sx = map(this.x / this.z, 0, 1, 0, width);
         var sy = map(this.y / this.z, 0, 1, 0, height);
 
         var r = map(this.z, 0, width, 16, 0);
         ellipse(sx, sy, r, r);
 
-        var px = map(this.x / this.pz, 0, 1, 0, width);
-        var py = map(this.y / this.pz, 0, 1, 0, height);
-
-        this.pz = this.z;
-
-        stroke(255);
-        line(px, py, sx, sy);
 
     }
 }
@@ -117,20 +114,20 @@ function menu() {
     //creates different buttons for the menu and maps each button press to its corresponding function
     button = createButton("Normal Multiplayer")
     button.mousePressed(beginNormalMultiplayer)
-    button.position(655, 325);
+    button.position(655, 345);
 
     button2 = createButton("Multiplayer ball frenzy");
-    button2.position(650, 350);
+    button2.position(650, 370);
     button2.mousePressed(beginMultiplayerFrenzy);
 
 
     button4 = createButton("Crazy Mode")
-    button4.position(672, 275)
+    button4.position(672, 295)
     text("Randomly generated paddles and ball",100,295)
     button4.mousePressed(beginCrazyPaddles)
 
-    button5 = createButton("Epilepsy mode")
-    button5.position(667, 300)
+    button5 = createButton("SPAWN! mode")
+    button5.position(667, 320)
     text("Too many balls", 151, 355)
     button5.mousePressed(beginEpilepsyMode);
 
@@ -227,7 +224,9 @@ function MultiplayerFrenzymode() {
 
         //creates a ball and 2 paddles
         ball = new Ball();
+        //assigning isLeft to True ensures that the Paddle class works properly to implement the paddle object
         left = new Paddle(true);
+        //assigned to false as its the right paddle
         right = new Paddle(false);
 
         for (let i = 0; i < 2; i++) {
@@ -242,7 +241,7 @@ function MultiplayerFrenzymode() {
             b2 -= map(left.y, 400, 800, 0, 255)
             background(r2, 0, b2)
 
-            //defines what happens each time a ball is produced
+            //defines what happens each time a ball or paddle is produced
             for (let i = 0; i < balls.length; i++) {
                 balls[i].update();
                 balls[i].edges();
@@ -284,72 +283,91 @@ function MultiplayerFrenzymode() {
     //defines the ball class
     class Ball {
         constructor() {
+            //x and y position
             this.x = width / 2;
             this.y = height / 2;
-            this.xspeed = 0;
-            this.yspeed = 0;
+            //x and y speeds
+            this.ballvx = 0;
+            this.ballvy = 0;
+            //the radius of the ball
             this.r = 12;
 
             this.reset();
         }
 
         checkPaddleLeft(p) {
+            //function allows the ball to properly bounce off the paddle
+            //if statement ensures that the ball is within the x and y co-ordinates in relation to its radius so that
+            //it can bounce off the relevant paddle
             if (this.y - this.r < p.y + p.h / 2 &&
                 this.y + this.r > p.y - p.h / 2 &&
                 this.x - this.r < p.x + p.w / 2) {
 
+                //this means that the x coordinate of the ball is greater than that of the ball and as a result it should rebound
                 if (this.x > p.x) {
+                    //defines the different angles at which the ball would bounce off the paddle depending on where it hits the paddle
                     let diff = this.y - (p.y - p.h / 2);
                     let rad = radians(45);
                     let angle = map(diff, 0, p.h, -rad, rad);
-                    this.xspeed = 5 * cos(angle);
-                    this.yspeed = 5 * sin(angle);
+                    this.ballvx = 5 * cos(angle);
+                    this.ballvy = 5 * sin(angle);
                     this.x = p.x + p.w / 2 + this.r;
                 }
 
             }
         }
         checkPaddleRight(p) {
+            //same as checkPaddleLeft except the last part of the if statement has this.x+this.r>p.x-p.w/2 because of the
+            //horizontal difference between the two left and right paddles, as checkPaddleLeft had this.x+this.r<p.x+p.w
             if (this.y - this.r < p.y + p.h / 2 &&
                 this.y + this.r > p.y - p.h / 2 &&
                 this.x + this.r > p.x - p.w / 2) {
 
+                //this means that the x coordinate of the ball is greater than that of the ball and as a result it should rebound
                 if (this.x < p.x) {
-                    let diff = this.y - (p.y - p.h / 2);
-                    let angle = map(diff, 0, p.h, radians(225), radians(135));
-                    this.xspeed = 5 * cos(angle);
-                    this.yspeed = 5 * sin(angle);
+                    //defines the different angles at which the ball would bounce off the paddle depending on where it hits the paddle
+
+                    let difference = this.y - (p.y - p.h / 2);
+                    let angle = map(difference, 0, p.h, radians(225), radians(135));
+                    this.ballvx = 5 * cos(angle);
+                    this.ballvy = 5 * sin(angle);
                     this.x = p.x - p.w / 2 - this.r;
                 }
             }
         }
-
+        //updates the position of the ball by adding on the speed to x and y coordinates
         update() {
-            this.x += this.xspeed;
-            this.y += this.yspeed;
+            this.x += this.ballvx;
+            this.y += this.ballvy;
         }
-
+        //when the ball has gone out of bounds this function is called to respawn the ball
         reset() {
+            //spawns it at the middle of the sketch
             this.x = width / 2;
             this.y = height / 2;
+            //allows the ball to pop up at a random speed and angle when it has been generated
             let angle = random(-PI / 4, PI / 4);
-            this.xspeed = 5 * Math.cos(angle);
-            this.yspeed = 5 * Math.sin(angle);
+            this.ballvx = 5 * Math.cos(angle);
+            this.ballvy = 5 * Math.sin(angle);
 
             if (random(1) < 0.5) {
-                this.xspeed *= -1;
+                this.ballvx *= -1;
             }
         }
 
         edges() {
+            //if the ball hits the top or bottom edges, it then bounces back as its ballvy is made negative, sending it in the opposite y direction
             if (this.y < 0 || this.y > height) {
-                this.yspeed *= -1;
+                this.ballvy *= -1;
             }
-
+            //checks whether the ball has gone past the right side
+            //this means there would be a point for the left player, which is why Lscore is incremented
             if (this.x - this.r > width) {
                 Lscore++;
                 this.reset();
             }
+            //checks whether the ball has gone past the left side
+            //this means there would be a point for the right player, which is why Rscore is incremented
 
             if (this.x + this.r < 0) {
                 Rscore++;
@@ -358,6 +376,7 @@ function MultiplayerFrenzymode() {
         }
 
         show() {
+            //displays the ball on screen
             fill(random(255), 0, random(255));
             ellipse(this.x, this.y, this.r * 2);
         }
@@ -369,8 +388,9 @@ class Paddle {
         this.y = height / 2;
         this.w = 20;
         this.h = 100;
-        this.ychange = 0;
+        this.stepchange = 0;
 
+        //assigns the x position of the paddle depending on whether it is the left or the right paddle
         if (isLeft) {
             this.x = this.w;
         } else {
@@ -381,15 +401,17 @@ class Paddle {
     }
 
     update() {
-        this.y += this.ychange;
+        this.y += this.stepchange;
+        //ensures that the paddle stays in between the playing regions due to the constrain function
         this.y = constrain(this.y, this.h / 2, height - this.h / 2);
     }
-
+    //defines how far the paddle should be moved depending on the step count which is incremented when move control keys are held down
     move(steps) {
-        this.ychange = steps;
+        this.stepchange = steps;
     }
 
     show() {
+        //displays the paddle
         rectMode(CENTER);
         fill(random(255), random(255), random(255));
         rect(this.x, this.y, this.w, this.h);
@@ -414,16 +436,12 @@ function NormalMultiplayermode() {
 
     this.setup = function() {
         createCanvas(800, 400);
-        //menu();
 
         ball = new Ball();
         left = new Paddle2(true);
         right = new Paddle2(false);
 
-        //for (let i = 0; i<2; i++) {
-        //balls[i] = new Ball()
 
-        //}
 
         this.draw = function() {
             background(0);
@@ -431,13 +449,7 @@ function NormalMultiplayermode() {
             b2 -= map(left.y, 400, 800, 0, 255)
             background(r2, 0, b2)
 
-            //for (let i= 0; i<balls.length; i++) {
-            //balls[i].update();
-            //balls[i].edges();
-            //balls[i].show();
-            //balls[i].checkPaddleRight(right)
-            //balls[i].checkPaddleLeft(left)
-            //}
+
             ball.checkPaddleRight(right);
             ball.checkPaddleLeft(left);
 
@@ -466,8 +478,8 @@ class Ball {
     constructor() {
         this.x = width / 2;
         this.y = height / 2;
-        this.xspeed = 0;
-        this.yspeed = 0;
+        this.ballvx = 0;
+        this.ballvy = 0;
         this.r = 12;
 
         this.reset();
@@ -482,8 +494,8 @@ class Ball {
                 let diff = this.y - (p.y - p.h / 2);
                 let rad = radians(45);
                 let angle = map(diff, 0, p.h, -rad, rad);
-                this.xspeed = 5 * cos(angle);
-                this.yspeed = 5 * sin(angle);
+                this.ballvx = 5 * cos(angle);
+                this.ballvy = 5 * sin(angle);
                 this.x = p.x + p.w / 2 + this.r;
             }
 
@@ -497,33 +509,33 @@ class Ball {
             if (this.x < p.x) {
                 let diff = this.y - (p.y - p.h / 2);
                 let angle = map(diff, 0, p.h, radians(225), radians(135));
-                this.xspeed = 5 * cos(angle);
-                this.yspeed = 5 * sin(angle);
+                this.ballvx = 5 * cos(angle);
+                this.ballvy = 5 * sin(angle);
                 this.x = p.x - p.w / 2 - this.r;
             }
         }
     }
 
     update() {
-        this.x += this.xspeed;
-        this.y += this.yspeed;
+        this.x += this.ballvx;
+        this.y += this.ballvy;
     }
 
     reset() {
         this.x = width / 2;
         this.y = height / 2;
         let angle = random(-PI / 4, PI / 4);
-        this.xspeed = 5 * Math.cos(angle);
-        this.yspeed = 5 * Math.sin(angle);
+        this.ballvx = 5 * Math.cos(angle);
+        this.ballvy = 5 * Math.sin(angle);
 
         if (random(1) < 0.5) {
-            this.xspeed *= -1;
+            this.ballvx *= -1;
         }
     }
 
     edges() {
         if (this.y < 0 || this.y > height) {
-            this.yspeed *= -1;
+            this.ballvy *= -1;
         }
 
         if (this.x - this.r > width) {
@@ -549,7 +561,7 @@ class Paddle2 {
         this.y = height / 2;
         this.w = 20;
         this.h = 100;
-        this.ychange = 0;
+        this.stepchange = 0;
 
         if (isLeft) {
             this.x = this.w;
@@ -561,12 +573,12 @@ class Paddle2 {
     }
 
     update() {
-        this.y += this.ychange;
+        this.y += this.stepchange;
         this.y = constrain(this.y, this.h / 2, height - this.h / 2);
     }
 
     move(steps) {
-        this.ychange = steps;
+        this.stepchange = steps;
     }
 
     show() {
@@ -598,10 +610,6 @@ function CrazyPaddlesmode() {
         left = new Paddle(true);
         right = new Paddle(false);
 
-        //for (let i = 0; i<2; i++) {
-        //  balls[i] = new Ball()
-
-        // }
 
 
 
@@ -612,17 +620,12 @@ function CrazyPaddlesmode() {
 
     this.draw = function() {
         background(0);
+
         r2 = map(right.y, 0, 400, 255, 0)
         b2 -= map(left.y, 400, 800, 0, 255)
         background(r2, 0, b2)
 
-        //for (let i= 0; i<balls.length; i++) {
-        // balls[i].update();
-        // balls[i].edges();
-        // balls[i].show();
-        // balls[i].checkPaddleRight(right)
-        // balls[i].checkPaddleLeft(left)
-        // }
+
         ball.checkPaddleRight(right);
         ball.checkPaddleLeft(left);
 
@@ -648,10 +651,6 @@ function CrazyPaddlesmode() {
     }
 
 
-    //function mouseClicked() {
-    //  let b = new Ball();
-    //balls.push(b)
-    //}
     function keyReleased() {
         left.move(0);
         right.move(0);
@@ -663,8 +662,8 @@ function CrazyPaddlesmode() {
         constructor() {
             this.x = width / 2;
             this.y = height / 2;
-            this.xspeed = 0;
-            this.yspeed = 0;
+            this.ballvx = 0;
+            this.ballvy = 0;
             //randomly generates the size of the ball
             this.r = random(80);
 
@@ -680,8 +679,8 @@ function CrazyPaddlesmode() {
                     let diff = this.y - (p.y - p.h / 2);
                     let rad = radians(45);
                     let angle = map(diff, 0, p.h, -rad, rad);
-                    this.xspeed = 5 * cos(angle);
-                    this.yspeed = 5 * sin(angle);
+                    this.ballvx = 5 * cos(angle);
+                    this.ballvy = 5 * sin(angle);
                     this.x = p.x + p.w / 2 + this.r;
                 }
 
@@ -695,33 +694,33 @@ function CrazyPaddlesmode() {
                 if (this.x < p.x) {
                     let diff = this.y - (p.y - p.h / 2);
                     let angle = map(diff, 0, p.h, radians(225), radians(135));
-                    this.xspeed = 5 * cos(angle);
-                    this.yspeed = 5 * sin(angle);
+                    this.ballvx = 5 * cos(angle);
+                    this.ballvy = 5 * sin(angle);
                     this.x = p.x - p.w / 2 - this.r;
                 }
             }
         }
 
         update() {
-            this.x += this.xspeed;
-            this.y += this.yspeed;
+            this.x += this.ballvx;
+            this.y += this.ballvy;
         }
 
         reset() {
             this.x = width / 2;
             this.y = height / 2;
             let angle = random(-PI / 4, PI / 4);
-            this.xspeed = 5 * Math.cos(angle);
-            this.yspeed = 5 * Math.sin(angle);
+            this.ballvx = 5 * Math.cos(angle);
+            this.ballvy = 5 * Math.sin(angle);
 
             if (random(1) < 0.5) {
-                this.xspeed *= -1;
+                this.ballvx *= -1.5;
             }
         }
 
         edges() {
             if (this.y < 0 || this.y > height) {
-                this.yspeed *= -1;
+                this.ballvy *= -1.5;
             }
 
             if (this.x - this.r > width) {
@@ -746,7 +745,7 @@ function CrazyPaddlesmode() {
             this.y = height / 2;
             this.w = random(100);
             this.h = random(300);
-            this.ychange = 0;
+            this.stepchange = 0;
 
             if (isLeft) {
                 this.x = this.w;
@@ -758,12 +757,12 @@ function CrazyPaddlesmode() {
         }
 
         update() {
-            this.y += this.ychange;
+            this.y += this.stepchange;
             this.y = constrain(this.y, this.h / 2, height - this.h / 2);
         }
 
         move(steps) {
-            this.ychange = steps;
+            this.stepchange = steps;
         }
 
         show() {
@@ -855,8 +854,8 @@ function Epilepsymode() {
         constructor() {
             this.x = width / 2;
             this.y = height / 2;
-            this.xspeed = 0;
-            this.yspeed = 0;
+            this.ballvx = 0;
+            this.ballvy = 0;
             this.r = 12;
 
             this.reset();
@@ -871,8 +870,8 @@ function Epilepsymode() {
                     let diff = this.y - (p.y - p.h / 2);
                     let rad = radians(45);
                     let angle = map(diff, 0, p.h, -rad, rad);
-                    this.xspeed = 5 * cos(angle);
-                    this.yspeed = 5 * sin(angle);
+                    this.ballvx = 5 * cos(angle);
+                    this.ballvy = 5 * sin(angle);
                     this.x = p.x + p.w / 2 + this.r;
                 }
 
@@ -886,33 +885,33 @@ function Epilepsymode() {
                 if (this.x < p.x) {
                     let diff = this.y - (p.y - p.h / 2);
                     let angle = map(diff, 0, p.h, radians(225), radians(135));
-                    this.xspeed = 5 * cos(angle);
-                    this.yspeed = 5 * sin(angle);
+                    this.ballvx = 5 * cos(angle);
+                    this.ballvy = 5 * sin(angle);
                     this.x = p.x - p.w / 2 - this.r;
                 }
             }
         }
 
         update() {
-            this.x += this.xspeed;
-            this.y += this.yspeed;
+            this.x += this.ballvx;
+            this.y += this.ballvy;
         }
 
         reset() {
             this.x = width / 2;
             this.y = height / 2;
             let angle = random(-PI / 4, PI / 4);
-            this.xspeed = 5 * Math.cos(angle);
-            this.yspeed = 5 * Math.sin(angle);
+            this.ballvx = 5 * Math.cos(angle);
+            this.ballvy = 5 * Math.sin(angle);
 
             if (random(1) < 0.5) {
-                this.xspeed *= -1;
+                this.ballvx *= -1;
             }
         }
 
         edges() {
             if (this.y < 0 || this.y > height) {
-                this.yspeed *= -1;
+                this.ballvy *= -1;
             }
 
             if (this.x - this.r > width) {
@@ -938,7 +937,7 @@ function Epilepsymode() {
             this.y = height / 2;
             this.w = 20;
             this.h = 100;
-            this.ychange = 0;
+            this.stepchange = 0;
 
             if (isLeft) {
                 this.x = this.w;
@@ -950,12 +949,12 @@ function Epilepsymode() {
         }
 
         update() {
-            this.y += this.ychange;
+            this.y += this.stepchange;
             this.y = constrain(this.y, this.h / 2, height - this.h / 2);
         }
 
         move(steps) {
-            this.ychange = steps;
+            this.stepchange = steps;
         }
 
         show() {
